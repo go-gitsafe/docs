@@ -1,3 +1,9 @@
+# Hugo
+/public/
+/resources/_gen/
+.hugo_build.lock
+
+# Left from the MkDocs era, kept so an old working tree stays clean
 /site/
 .venv/
 __pycache__/
