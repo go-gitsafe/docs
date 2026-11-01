@@ -7,6 +7,8 @@ weight: 10
 
 Guards on what leaves a machine: a global git hook that refuses a credential in a remote URL and a write to the branch pull requests land on, a credential helper that never lets a token reach a command line, and a scope checker that reads a token's powers without printing it.
 
+And guards on what lands: the commands that merge, tag and create act only on evidence — a check that actually ran, a tag that does not already exist, a repository that already has a default branch — while a scanner walks a whole machine taking credentials back out of remote URLs. Seventeen commands in all.
+
 Part of the **Packaging & supply chain** family of the
 [pure-Go ecosystem](https://go-desktop.github.io/) — 1 module,
 all `CGO_ENABLED=0`.
