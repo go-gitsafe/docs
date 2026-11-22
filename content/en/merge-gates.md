@@ -28,6 +28,28 @@ A bare mention is refused, naming the issue and both forms. `--issues-waiver
 "<reason>"` merges anyway and records the reason as a comment on the pull
 request; there is no default and an empty reason is refused.
 
+### Quoting a reference, so it decides nothing
+
+A reference inside a code span, a fenced block, an HTML comment or a plain URL
+is not a reference: that is how a body discusses an issue number without
+disposing of it, and it is the only honest way to name an issue that is already
+closed, since neither form fits one — `Closes` says this pull request finishes
+it, and `Refs` says it stays open on purpose.
+
+Since **v0.59.0** a code span may wrap a line break, as CommonMark allows. The
+earlier reading required a span to fit on one line, with two consequences that
+reflowing a paragraph to 80 columns could introduce invisibly: a quoted
+identifier became a real reference the author was asked to dispose of, and — the
+dangerous direction — a merely quoted `Closes` counted as a real disposition, so
+the gate could allow a merge on a decision GitHub itself never carries out.
+
+A backtick run opens a span that only a run of the same length closes, and an
+unclosed run is literal text. The line breaks a span covered are preserved,
+because a keyword binds only within its own line.
+
+⚠ A caller pinning an older `gitsafe` keeps the older reading: a body is judged
+by whichever version the tool that reads it was built with.
+
 After the merge, every issue closed by keyword is read back. If GitHub did not
 close it (another repository, a base branch that is not the default, a missing
 permission) `ghmerge` closes it with the comment `Closed by <owner/repo>#<PR>
