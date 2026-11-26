@@ -21,6 +21,8 @@ API documentation lives. The API itself is generated from the source and served 
 duplicating it here would only create a second copy to go stale.
 
 - **[Modules]({{< relref "modules.md" >}})** — every module in go-gitsafe, with its source and its reference.
+- **[The Bash guard]({{< relref "bash-guard.md" >}})** — how `guard-bash` judges a command line.
+- **[The read guard]({{< relref "read-guard.md" >}})** — `guard-read` and `secretpeek`: refusing to display a file whose content holds a credential.
 
 ## What every module here is held to {#what-every-module-here-is-held-to}
 
