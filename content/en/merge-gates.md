@@ -13,6 +13,57 @@ it). It merges on evidence, not on the absence of a failure.
 A check must have run, every check that ran must have passed, and GitHub must
 say the pull request is mergeable.
 
+## The release gate
+
+A Go change in a tagged module must not be merged without a tag. Merged alone,
+the code is on `main` and invisible to `go get`: the module proxy resolves
+`@latest` to the highest release, and an untagged commit is only a
+pseudo-version ([Go modules reference, "Versions"](https://go.dev/ref/mod#versions)
+and ["Mapping versions to commits"](https://go.dev/ref/mod#vcs-version)). It
+happened eight times, the last two on 2026-11-27.
+
+The gate asks the question **per module**. Each changed file belongs to the
+module of the nearest `go.mod` above it, and a module's releases are the tags
+under its own prefix:
+
+| Module | Its tags |
+| --- | --- |
+| the repository root | `vX.Y.Z` |
+| a module in a subdirectory `sub` | `sub/vX.Y.Z` |
+| a module in a major version subdirectory `sub/v2` | `sub/v2.X.Y` |
+
+Tags of one module say nothing about another: a repository whose only tags are
+`sub/v1.2.0` is a tagged module for `sub` and not for its root.
+
+`ghmerge` refuses, before merging, a pull request that changes a non-test `.go`
+file, a `go.mod` or a `go.sum` (a rename out of one counts) in a module that has
+at least one stable release. It names the exact command, with the next PATCH over
+every tag of that module (GitHub's tag listing is not in semver order):
+
+```text
+ghmerge: merge AND tag it in one command: ghrelease owner/repo 42 sub/v0.10.1
+```
+
+`ghrelease` tags a prefixed module, one tag per merge, and checks the tag against
+the `go.mod` at the merge commit. A pull request that changes several tagged
+modules gets a command for each; the others run after the merge, and `ghrelease`
+tags the merge commit of an already merged pull request.
+
+What the gate cannot read is not "no Go change": a failed tag, file or tree read,
+a file list shorter than the pull request says, or a truncated tree (which cannot
+say which `go.mod` owns a file) refuses, naming the cause. `--no-release
+"<why>"` merges anyway, for a series whose later pull request carries the tag;
+there is no default and an empty reason is refused. `ghrelease` passes it itself,
+since it is the release.
+
+A module and its major version subdirectory that are both released (`sub` and
+`sub/v2`) share the prefix `sub/`: the gate names a version of the highest line,
+`ghrelease` rejects a wrong one against the `go.mod`, and `--no-release` is the
+way through.
+
+The full rules are in the
+[`gitsafe` README](https://github.com/go-gitsafe/gitsafe#the-release-gate-a-go-change-in-a-tagged-module-is-merged-with-a-tag-or-not-at-all).
+
 ## The issues gate
 
 A pull request must not land while an issue it mentions is left silently open.
